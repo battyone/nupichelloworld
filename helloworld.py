@@ -1,53 +1,67 @@
-from nupic.research.flat_spatial_pooler import FlatSpatialPooler as FP
-from nupic.research.spatial_pooler import SpatialPooler
+"""A simple program that demonstrates the working of the spatial pooler"""
+# ----------------------------------------------------------------------
+# Numenta Platform for Intelligent Computing (NuPIC)
+# Copyright (C) 2013, Numenta, Inc.  Unless you have purchased from
+# Numenta, Inc. a separate commercial license for this software code, the
+# following terms and conditions apply:
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses.
+#
+# http://numenta.org/licenses/
+# ----------------------------------------------------------------------
+
+from nupic.research.spatial_pooler import SpatialPooler as SP
 import numpy as np
-import sys
 from random import randrange
 
-class Example:
+class Example():
   
-  def __init__(self):
-    
-    self.inputArray=np.zeros(32*32)	#Will be our input. Initializing to zeros 
-    self.activeArray=np.zeros(64*64)	#To be passed to compute. Initialized to 0. The result, that is the active columns, will be represented by this array (later)
-    self.flat=FP()			#An instance of our flat spatial pooler. A flat spatial pooler does not implement topology. More details will be added
+  """A class to hold our code. Going object oriented"""
+  
+  def __init__(self, inputShape, columnDimensions):
+    """
+     Parameters:
+     ----------
+     _inputShape	:	The size of the input. The product of the first and second elements of this parameter determines the size of the input vectors
+     _columnDimensions:	The size of the 2 dimensional array of columns
+     """
+    self.inputShape = inputShape
+    self.columnDimensions = columnDimensions
+    self.inputSize = np.array(inputShape).prod()
+    self.columnNumber = np.array(columnDimensions).prod()
+    self.inputArray = np.zeros(self.inputSize)
+    self.activeArray = np.zeros(self.columnNumber)
+    self.sp = SP(self.inputShape, self.columnDimensions)
     
   def create_input(self):
-    #We clear the already existing inputArray before we create a new one
-    self.inputArray[0:]=0
+    """create a random input vector"""
     
-    for i in range(1023):
-      self.inputArray[i]=randrange(2)	#randrange() returns a random integer within the range. In this case, its either 0 or 1
+    #clear the inputArray to zero before creating a new input vector
+    self.inputArray[0:] = 0
     
+    for i in range(self.inputSize):
+      #randrange returns 0 or 1
+      self.inputArray[i] = randrange(2)
+      
   def run(self):
-    #Apply the input vector to the spatial pooler
-    #What happens is that, flat.compute() does all the calculations and set the indices of activeArray is 1 if the corresponding column is active
-    #For example, if column 1248 is a winner, then activeArray[1248]=1
-    self.flat.compute(self.inputArray,True,self.activeArray)
-    #To see the active columns
-    self.print_results()  
+    """Run the spatial pooler with the input vector"""
     
+    #activeArray[column]=1 if column is active after spatial pooling
+    self.sp.compute(self.inputArray, True, self.activeArray)
     
-  def print_results(self):
-    #Get the results of the spatial pooling
-    #Printing the columns that are active after each step
-    for i in range(4096):	
-      if self.activeArray[i]!=0:
-	print i,
-    print "\n*****Next set*****"
+    print self.activeArray.nonzero() 
     
-
-
-#Running our example  
-example=Example()
-
-for i in range(10):	#We supply 10 different input vectors
+example = Example((32, 32), (64, 64))
+for i in range(3):
   example.create_input()
-  example.run()		
-
-    
-    
-    
-    
-    
-    
+  example.run()
