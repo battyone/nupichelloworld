@@ -41,7 +41,14 @@ class Example():
     self.columnNumber = np.array(columnDimensions).prod()
     self.inputArray = np.zeros(self.inputSize)
     self.activeArray = np.zeros(self.columnNumber)
-    self.sp = SP(self.inputShape, self.columnDimensions)
+
+    self.sp = SP(self.inputShape, 
+		 self.columnDimensions,
+		 potentialRadius = self.inputSize,
+		 numActiveColumnsPerInhArea = int(0.02*self.columnNumber),
+		 globalInhibition = True,
+		 synPermActiveInc = 0.01
+		 )
     
   def create_input(self):
     """create a random input vector"""
@@ -62,6 +69,12 @@ class Example():
     print self.activeArray.nonzero() 
     
 example = Example((32, 32), (64, 64))
+
+#Trying random vectors
 for i in range(3):
   example.create_input()
+  example.run()
+  
+#Trying identical vectors
+for i in range(3):
   example.run()
