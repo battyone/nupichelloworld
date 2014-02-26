@@ -74,7 +74,8 @@ example = Example((32, 32), (64, 64))
 for i in range(3):
   example.create_input()
   example.run()
-  
+
+print "-"*75+"Using identical input vectors"+"-"*75  
 #Trying identical vectors
-for i in range(3):
+for i in range(2):
   example.run()
