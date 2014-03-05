@@ -22,7 +22,7 @@
 
 from nupic.research.spatial_pooler import SpatialPooler as SP
 import numpy as np
-from random import randrange
+from random import randrange, random
 
 class Example():
   
@@ -66,8 +66,30 @@ class Example():
     #activeArray[column]=1 if column is active after spatial pooling
     self.sp.compute(self.inputArray, True, self.activeArray)
     
-    print self.activeArray.nonzero() 
+    print self.activeArray.nonzero()
     
+  def add_noise(self,noise_level):
+    """Flip the value of 10% of input bits (add noise)
+      
+      PARAMETERS
+      ----------
+      noise_level : The percentage of total input bits that should be flipped """
+    
+    for i in range(int(noise_level * self.inputSize)):
+      #0.1*self.inputSize represents 10% of the total input bits
+      #random.random() returns a float between 0 and 1
+      randomPosition = int(random() * self.inputSize)
+      
+      #Flipping the bit at the randomly picked position
+      if self.inputArray[randomPosition] == 1:
+	self.inputArray[randomPosition] = 0
+	
+      else:
+        self.inputArray[randomPosition] = 1
+    
+      #Uncomment the following line to know which positions had been flipped.
+      #print "The value at " + str(randomPosition) + " has been flipped"
+	
 example = Example((32, 32), (64, 64))
 
 #Trying random vectors
@@ -75,7 +97,20 @@ for i in range(3):
   example.create_input()
   example.run()
 
-print "-"*75+"Using identical input vectors"+"-"*75  
+print "-" * 75 + "Using identical input vectors" + "-" * 75  
+
 #Trying identical vectors
 for i in range(2):
   example.run()
+  
+#Adding 10% noise to the input vector
+#Notice how the output SDR hardly changes at all
+print "-" * 75 + "After adding 10% noise to the input vector" + "-" * 75
+example.add_noise(0.1)
+example.run()
+
+#Adding another 40% noise to the already modified input vector
+#The output SDR should differ considerably from that of the previous output
+print "-" * 75 + "After adding another 20% noise to the input vector" + "-" * 75
+example.add_noise(0.2)
+example.run()
