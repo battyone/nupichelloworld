@@ -94,6 +94,7 @@ example = Example((32, 32), (64, 64))
 
 #Trying random vectors
 for i in range(3):
+  #Creating totally random input vectors	
   example.create_input()
   example.run()
 
@@ -109,7 +110,7 @@ print "-" * 75 + "After adding 10% noise to the input vector" + "-" * 75
 example.add_noise(0.1)
 example.run()
 
-#Adding another 40% noise to the already modified input vector
+#Adding another 20% noise to the already modified input vector
 #The output SDR should differ considerably from that of the previous output
 print "-" * 75 + "After adding another 20% noise to the input vector" + "-" * 75
 example.add_noise(0.2)
